@@ -6,15 +6,25 @@ const mongoose = require("mongoose");
 router.get('/',(req, res, next)=>{
     
     Product.find()
+    .select("name price _id")
     .exec()
-    .then(doc=>{
-        console.log(doc);
-        if(doc){
-            res.status(200).json({doc});    
-        }else{
-            res.status(404).json({message: "Data not found"});
-        }
+    .then(docs=>{
+        const response = {
+            count: docs.length,
+            products: docs.map(doc=>{
+                return{
+                    name: doc.name,
+                    price: doc.price,
+                    _id: doc._id,
+                    request:{
+                        type: "GET",
+                        url:"https://api-project-rsinghal26.c9users.io/products/"+ doc._id
+                    }
+                };
+            })
+        };
         
+        res.status(200).json(response);
     })
     .catch(err=>{
         console.log(err);
@@ -26,11 +36,17 @@ router.get('/:productId',(req, res, next)=>{
     const _id = req.params.productId;
     console.log(_id);
     Product.findById(_id)
+    .select("name price _id")
     .exec()
     .then(doc=>{
-        console.log(doc);
         if(doc){
-            res.status(200).json({doc});    
+            res.status(200).json({
+                product:doc,
+                request:{
+                    type:"GET",
+                    url:"https://api-project-rsinghal26.c9users.io/products"
+                }
+            }); 
         }else{
             res.status(404).json({message: "Data not found"});
         }
@@ -52,10 +68,17 @@ router.post('/',(req, res, next)=>{
     }); 
     
     product.save().then(result=>{
-        console.log(result);
         res.status(201).json({
             message: 'Product saved',
-            currentProduct: product
+            currentProduct: {
+                name:result.name,
+                price:result.price,
+                _id: result._id
+            },
+            request:{
+                type:"GET",
+                url:"https://api-project-rsinghal26.c9users.io/products/"+ result._id
+            }
         }); 
     }).catch(err=>{
        console.log(err);
@@ -76,8 +99,13 @@ router.patch('/:productId',(req, res, next)=>{
     Product.updateOne({_id:id}, {$set:updateData})
     .exec().
     then(result=>{
-        console.log(result);
-        res.status(200).json({result});
+        res.status(200).json({
+            message:"Changes has been done",
+            request:{
+                type:"GET",
+                ulr:"https://api-project-rsinghal26.c9users.io/products/"+id
+            }
+        });
     }).catch(err=>{
        res.status(500).json({error:err}); 
     });
@@ -89,7 +117,17 @@ router.delete('/:productId',(req, res, next)=>{
     .exec()
     .then(result=>{
         console.log(result);
-        res.status(200).json({result});
+        res.status(200).json({
+            message:"Product deleted",
+            request:{
+                type:"POST",
+                url:"https://api-project-rsinghal26.c9users.io/products",
+                data:{
+                    name:"String",
+                    price:"Number"
+                }
+            }
+        });
     })
     .catch(err=>{
         res.status(500).json({error:err});
