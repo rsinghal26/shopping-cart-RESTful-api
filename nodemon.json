@@ -1,0 +1,5 @@
+{
+    "env":{
+        "MONGO_PASS": "Raja@123mongodb"  
+    }
+}
