@@ -1,12 +1,38 @@
 const express = require("express");
-const Product = require("../models/product.js");
+const Product = require("../models/product");
 const router = express.Router();
 const mongoose = require("mongoose");
+const multer = require("multer");
+const checkAuth = require("../middleware/check-auth");
+
+const uploadStorage  = multer.diskStorage({
+    destination: function(req, file, cb){
+        cb(null, './uploads/');
+    },
+    filename: function(req, file, cb){
+        cb(null, new Date().toISOString()+file.originalname);
+    }
+});
+
+const fileFielter = function(req, file, cb){
+    if(file.mimetype == 'image/png' || file.mimetype == 'image/jppeg')
+        return cb(null, true);
+    else
+        return cb(null,false);
+};
+
+const upload = multer({
+    storage:uploadStorage,
+    fileFielter: fileFielter,
+    limit:{
+        filesize: 1024*1024*5
+    }
+});
 
 router.get('/',(req, res, next)=>{
     
     Product.find()
-    .select("name price _id")
+    .select("name price _id productImage")
     .exec()
     .then(docs=>{
         const response = {
@@ -16,6 +42,7 @@ router.get('/',(req, res, next)=>{
                     name: doc.name,
                     price: doc.price,
                     _id: doc._id,
+                    productImage: doc.productImage,
                     request:{
                         type: "GET",
                         url:"https://api-project-rsinghal26.c9users.io/products/"+ doc._id
@@ -36,7 +63,7 @@ router.get('/:productId',(req, res, next)=>{
     const _id = req.params.productId;
     console.log(_id);
     Product.findById(_id)
-    .select("name price _id")
+    .select("name price _id productImage")
     .exec()
     .then(doc=>{
         if(doc){
@@ -59,12 +86,13 @@ router.get('/:productId',(req, res, next)=>{
     
 });
 
-router.post('/',(req, res, next)=>{
-    
+router.post('/', checkAuth, upload.single('productImage'),(req, res, next)=>{
+    console.log(req.file);
     const product = new Product({
        _id:  new mongoose.Types.ObjectId(),
        name: req.body.name,
-       price: req.body.price
+       price: req.body.price,
+       productImage: req.file.path
     }); 
     
     product.save().then(result=>{
@@ -90,7 +118,7 @@ router.post('/',(req, res, next)=>{
 });
 
 
-router.patch('/:productId',(req, res, next)=>{
+router.patch('/:productId',checkAuth,(req, res, next)=>{
     const id = req.params.productId;
     const updateData = {};
     for(const data of req.body){
@@ -111,7 +139,7 @@ router.patch('/:productId',(req, res, next)=>{
     });
 });
 
-router.delete('/:productId',(req, res, next)=>{
+router.delete('/:productId', checkAuth,(req, res, next)=>{
     const id = req.params.productId;
     Product.remove({_id: id})
     .exec()
@@ -123,8 +151,9 @@ router.delete('/:productId',(req, res, next)=>{
                 type:"POST",
                 url:"https://api-project-rsinghal26.c9users.io/products",
                 data:{
-                    name:"String",
-                    price:"Number"
+                    name: "String",
+                    price: "Number",
+                    productImage: "String"
                 }
             }
         });

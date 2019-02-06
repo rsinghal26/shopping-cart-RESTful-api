@@ -4,14 +4,16 @@ const morgan = require("morgan");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 
-const productRoutes = require("./routes/products.js");
-const orderRoutes = require("./routes/orders.js");
+const productRoutes = require("./routes/products");
+const orderRoutes = require("./routes/orders");
+const userRoutes = require("./routes/users");
 
 mongoose.connect(
    "mongodb://localhost/shoppingCart",
    { useNewUrlParser: true }
 );
 
+app.use("/uploads",express.static('uploads'));
 
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({extended:false}));
@@ -32,6 +34,7 @@ app.use((req, res, next)=>{
 // Handle all routes-------------
 app.use('/products',productRoutes);
 app.use('/orders',orderRoutes);
+app.use('/user',userRoutes);
 
 app.use((req, res, next)=>{
    const error  = new Error();

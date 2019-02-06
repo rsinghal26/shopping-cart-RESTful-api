@@ -1,5 +1,5 @@
 {
     "env":{
-        "MONGO_PASS": "Raja@123mongodb"  
+        "JWT_KEY": "secret"
     }
 }
