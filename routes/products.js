@@ -32,7 +32,7 @@ const upload = multer({
 router.get('/',(req, res, next)=>{
     
     Product.find()
-    .select("name price _id productImage")
+    .select("name price _id productImage productSeller")
     .exec()
     .then(docs=>{
         const response = {
@@ -43,6 +43,7 @@ router.get('/',(req, res, next)=>{
                     price: doc.price,
                     _id: doc._id,
                     productImage: doc.productImage,
+                    sellerEmail: doc.productSeller.email,
                     request:{
                         type: "GET",
                         url:"https://api-project-rsinghal26.c9users.io/products/"+ doc._id
@@ -63,7 +64,7 @@ router.get('/:productId',(req, res, next)=>{
     const _id = req.params.productId;
     console.log(_id);
     Product.findById(_id)
-    .select("name price _id productImage")
+    .select("name price _id productImage productSeller.email")
     .exec()
     .then(doc=>{
         if(doc){
@@ -87,12 +88,18 @@ router.get('/:productId',(req, res, next)=>{
 });
 
 router.post('/', checkAuth, upload.single('productImage'),(req, res, next)=>{
-    console.log(req.file);
+    
+    const productSeller = {
+        id: req.userData.userId,
+        email: req.userData.email
+    };
+    
     const product = new Product({
        _id:  new mongoose.Types.ObjectId(),
        name: req.body.name,
        price: req.body.price,
-       productImage: req.file.path
+       productImage: req.file.path,
+       productSeller: productSeller
     }); 
     
     product.save().then(result=>{

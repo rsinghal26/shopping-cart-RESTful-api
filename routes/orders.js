@@ -6,8 +6,8 @@ const mongoose = require("mongoose");
 const checkAuth = require("../middleware/check-auth");
 
 router.get('/', checkAuth,(req, res, next)=>{
-    Order.find()
-    .select("productId quantity _id")
+    Order.find({buyer: req.userData.userId})
+    .select("productId quantity _id buyer")
     .populate("productId", "_id name")
     .exec()
     .then(docs=>{
@@ -18,6 +18,7 @@ router.get('/', checkAuth,(req, res, next)=>{
                     _id: doc._id,
                     productId: doc.productId,
                     quantity: doc.quantity,
+                    buyer: doc.buyer,
                     request:{
                         type:"GET",
                         url:"https://api-project-rsinghal26.c9users.io/orders/"+ doc._id
@@ -35,9 +36,9 @@ router.get('/', checkAuth,(req, res, next)=>{
 });
 
 router.get('/:orderId', checkAuth,(req, res, next)=>{
-    const _id = req.params.orderId;
+    const id = req.params.orderId;
 
-    Order.findById(_id)
+    Order.find({_id: id, buyer:req.userData.userId})
     .select("productId quantity _id")
     .populate("productId")
     .exec()
@@ -77,7 +78,8 @@ router.post('/', checkAuth,(req, res, next)=>{
         const order = new Order({
             _id:  new mongoose.Types.ObjectId(),
             productId: req.body.productId,
-            quantity: req.body.quantity
+            quantity: req.body.quantity,
+            buyer: req.userData.userId
         });
         return order.save();
     }).then(result=>{
@@ -100,7 +102,7 @@ router.post('/', checkAuth,(req, res, next)=>{
 
 router.delete('/:orderId', checkAuth, (req, res, next)=>{
     const id = req.params.orderId;
-    Product.remove({_id: id})
+    Product.remove({_id: id, buyer:req.userData.userId})
     .exec()
     .then(result=>{
     
