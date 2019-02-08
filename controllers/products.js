@@ -18,7 +18,7 @@ exports.get_all_products = (req, res, next)=>{
                     sellerEmail: doc.productSeller.email,
                     request:{
                         type: "GET",
-                        url:"https://api-project-rsinghal26.c9users.io/products/"+ doc._id
+                        url:"https://localhost:3000/products/"+ doc._id
                     }
                 };
             })
@@ -46,7 +46,7 @@ exports.get_a_product = (req, res, next)=>{
                 product:doc,
                 request:{
                     type:"GET",
-                    url:"https://api-project-rsinghal26.c9users.io/products"
+                    url:"https://localhost:3000/products"
                 }
             }); 
         }else{
@@ -86,7 +86,7 @@ exports.post_new_product = (req, res, next)=>{
             },
             request:{
                 type:"GET",
-                url:"https://api-project-rsinghal26.c9users.io/products/"+ result._id
+                url:"https://localhost:3000/products/"+ result._id
             }
         }); 
     }).catch(err=>{
@@ -110,7 +110,7 @@ exports.update_a_product = (req, res, next)=>{
             message:"Changes has been done",
             request:{
                 type:"GET",
-                ulr:"https://api-project-rsinghal26.c9users.io/products/"+id
+                ulr:"https://localhost:3000/products/"+id
             }
         });
     }).catch(err=>{
@@ -129,7 +129,7 @@ exports.delete_product = (req, res, next)=>{
             message:"Product deleted",
             request:{
                 type:"POST",
-                url:"https://api-project-rsinghal26.c9users.io/products",
+                url:"https://localhost:3000/products",
                 data:{
                     name: "String",
                     price: "Number",
