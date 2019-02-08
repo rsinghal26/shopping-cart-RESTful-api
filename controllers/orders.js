@@ -17,7 +17,7 @@ exports.get_your_orders = (req, res, next)=>{
                     buyer: doc.buyer,
                     request:{
                         type:"GET",
-                        url:"https://api-project-rsinghal26.c9users.io/orders/"+ doc._id
+                        url:"https://localhost:3000/orders/"+ doc._id
                     }
                 }; 
             })
@@ -44,7 +44,7 @@ exports.get_a_order = (req, res, next)=>{
                 order: doc,
                 request:{
                     type:"GET",
-                    url:"https://api-project-rsinghal26.c9users.io/orders"
+                    url:"https://localhost:3000/orders"
                 }
             }); 
         }else{
@@ -87,7 +87,7 @@ exports.post_new_order = (req, res, next)=>{
             },
             request:{
                 type: "GET",
-                url: "https://api-project-rsinghal26.c9users.io/orders/"+ result._id
+                url: "https://localhost:3000/orders/"+ result._id
             }
         });
     }).catch(err=>{
@@ -105,7 +105,7 @@ exports.delete_order = (req, res, next)=>{
             message:"Order deleted",
             request:{
                 type:"POST",
-                url:"https://api-project-rsinghal26.c9users.io/orders",
+                url:"https://localhost:3000/orders",
                 data:{
                     productId:"ID",
                     quantity:"Number"
