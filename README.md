@@ -1,6 +1,6 @@
 # shopping-cart-restfull-api
 
-Basic RestFull api for shopping where you can add/delete your product and order any product after authorization.
+Basic RESTful api for shopping where you can add/delete your product and order any product after authorization.
 #### DESCRIPTION
 
  -    Built a REST Api in Node.js using MVC approch using Node.js + MongoDB.
